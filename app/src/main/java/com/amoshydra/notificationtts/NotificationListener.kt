@@ -4,35 +4,26 @@ import android.service.notification.StatusBarNotification
 import android.util.Log
 
 class NotificationListener : android.service.notification.NotificationListenerService() {
+    private val notificationProcessor = NotificationProcessor()
+
     companion object {
         private val TAG = NotificationListener::class.java.simpleName
     }
 
     override fun onListenerConnected() {
         super.onListenerConnected()
-        handleListenerConnected()
+        Log.i(TAG, "NotificationTTS Listener Service connected")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         super.onNotificationPosted(sbn)
-        Log.i(TAG, "Notification " + sbn.id)
-        Log.i(TAG, "Notification " + sbn.notification.tickerText)
-
-        val extras = sbn.notification.extras.keySet()
-            .joinToString("\n") {
-                    key -> "$key: " + sbn.notification.extras.get(key)
-            }
-        Log.i(TAG, "Notification $extras")
-        Log.i(TAG, "Notification " + sbn.packageName)
+        notificationProcessor.process(sbn)
     }
 
+    @Suppress("RedundantOverride")
+    // onNotificationRemoved method was abstract before API 21.
+    // The abstract implementation is required although redundant.
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         super.onNotificationRemoved(sbn)
-        Log.i(TAG, "Removed " + sbn.id)
-        Log.i(TAG, "Removed" + sbn.packageName)
-    }
-
-    private fun handleListenerConnected() {
-        Log.i(TAG, "Success")
     }
 }
