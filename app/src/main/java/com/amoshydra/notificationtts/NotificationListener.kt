@@ -17,7 +17,10 @@ class NotificationListener : android.service.notification.NotificationListenerSe
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         super.onNotificationPosted(sbn)
-        notificationProcessor.process(sbn)
+        val text = notificationProcessor.process(sbn)
+
+        if (text == null || text.isEmpty()) return
+        Log.i(TAG, text)
     }
 
     @Suppress("RedundantOverride")
