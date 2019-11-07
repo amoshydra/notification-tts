@@ -1,6 +1,7 @@
 package com.amoshydra.notificationtts
 
 import android.app.Notification
+import android.os.Build
 import android.service.notification.StatusBarNotification
 import android.util.Log
 
@@ -20,7 +21,13 @@ class NotificationProcessor {
     }
 
     private fun shouldProcess(sbn: StatusBarNotification): Boolean {
-        if (sbn.notification.flags.and(Notification.FLAG_GROUP_SUMMARY) != 0) return false
+        val notification = sbn.notification
+
+        if (notification.flags.and(Notification.FLAG_GROUP_SUMMARY) != 0) return false
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            if (notification.extras.getString(Notification.EXTRA_TEMPLATE) != Notification.MessagingStyle::class.java.name) return false
+        }
 
         return true
     }
