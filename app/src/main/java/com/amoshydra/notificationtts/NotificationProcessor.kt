@@ -6,18 +6,15 @@ import android.service.notification.StatusBarNotification
 import android.util.Log
 
 class NotificationProcessor {
-    fun process(sbn: StatusBarNotification) {
-        if (!shouldProcess(sbn)) return
+    fun process(sbn: StatusBarNotification): String? {
+        if (!shouldProcess(sbn)) return null
+        log(sbn)
 
-        Log.i("TAG", "Notification " + sbn.id)
-        Log.i("TAG", "Notification " + sbn.notification.tickerText)
+        return makeSpeechText(sbn)
+    }
 
-        val extras = sbn.notification.extras.keySet()
-            .joinToString("\n") {
-                    key -> "$key: " + sbn.notification.extras.get(key)
-            }
-        Log.i("TAG", "Notification $extras")
-        Log.i("TAG", "Notification " + sbn.packageName)
+    private fun makeSpeechText(sbn: StatusBarNotification): String? {
+        return sbn.notification.extras.getString(Notification.EXTRA_TEXT)
     }
 
     private fun shouldProcess(sbn: StatusBarNotification): Boolean {
@@ -30,5 +27,19 @@ class NotificationProcessor {
         }
 
         return true
+    }
+
+    private fun log(sbn: StatusBarNotification) {
+        val extras = sbn.notification.extras.keySet()
+            .joinToString("\n") { key ->
+                val content = sbn.notification.extras.get(key)
+                var contentType = "null"
+                if (content != null) {
+                    contentType = content::class.java.simpleName
+                }
+                "$key: $contentType = $content"
+            }
+        Log.i("TAG", "Notification $extras")
+        Log.i("TAG", "Notification \"id\": Integer = " + sbn.id)
     }
 }
